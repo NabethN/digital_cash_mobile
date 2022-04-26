@@ -1,24 +1,23 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 
-class DigitalButton extends StatelessWidget {
+class EmptyDigitalCard extends StatelessWidget {
   final double width;
   final double height;
-  double corner,  borderRadius;
+  double corner, borderRadius;
   Color cornerColor;
   LinearGradient gradient;
   final bool topLeft, topRight, bottomRight, bottomLeft;
 
-  String text;
-  TextStyle textStyle;
-  final VoidCallback? onPressed;
+  final Widget? child;
 
-
-  DigitalButton({
+  EmptyDigitalCard({
     Key? key,
-    this.width = 256,
+    this.width = 250,
     this.height = 56,
     this.corner = 0,
-    this.borderRadius = 0,
+    this.borderRadius = 24,
     this.cornerColor = Colors.transparent,
     this.gradient = const LinearGradient(
       begin: Alignment.topLeft,
@@ -28,25 +27,31 @@ class DigitalButton extends StatelessWidget {
     this.topRight = false,
     this.bottomRight = false,
     this.bottomLeft = false,
-    this.text = "Some Rand text",
-    this.textStyle = const TextStyle(
-        fontSize: 22,
-        fontFamily: 'Heebo',
-        fontWeight: FontWeight.w500,
-        color: Colors.white),
-
-    required this.onPressed,
-  }) : super(key: key);
+    this.child,
+  }) : super(
+    key: key,
+  );
 
   @override
   Widget build(BuildContext context) {
+    Widget? current = child;
+
+    if (child == null) {
+      current = LimitedBox(
+        maxWidth: 0.0,
+        maxHeight: 0.0,
+        child: ConstrainedBox(constraints: const BoxConstraints.expand()),
+      );
+    }
+
     corner = corner == 0
         ? height > 132
-            ? 44
-            : height / 3
+        ? 44
+        : height / 3
         : corner; //default corner = 0.3*height but if corner is set by user, it's override it. corner never can be set to '0' && never bigger than 44 (Unless user specify it)
     return Stack(alignment: Alignment.center, children: [
       // Container(
+
       Container(
         width: width - ((corner / 3)),
         height: height - ((corner / 3)),
@@ -59,18 +64,15 @@ class DigitalButton extends StatelessWidget {
                   ? Color(0xffBEBEBE)
                   : cornerColor,
               width: 1),
-
-          // color: Colors.blue,
-          // borderRadius: BorderRadius.circular(15.0),
         ),
       ),
       Material(
         clipBehavior: Clip.antiAlias,
         color: Colors.transparent,
         shape: BeveledRectangleBorder(
-            // side: BorderSide(color: Colors.blue), // if you need
+          // side: BorderSide(color: Colors.blue), // if you need
 
-            // side: BorderSide(color: Colors.blue), if you need
+          // side: BorderSide(color: Colors.blue), if you need
             borderRadius: BorderRadius.only(
                 topLeft: topLeft
                     ? Radius.elliptical(corner, corner)
@@ -88,26 +90,13 @@ class DigitalButton extends StatelessWidget {
           width: width,
           height: height,
           decoration: BoxDecoration(
-            gradient: gradient,
+              gradient: gradient,
               // color: Colors.transparent,
-              borderRadius: BorderRadius.circular(borderRadius)
-          ),
-          child: ElevatedButton(
-            onPressed: onPressed,
+              borderRadius: BorderRadius.circular(borderRadius)),
 
-            style: ElevatedButton.styleFrom(
-              primary: Colors.transparent,
-              shadowColor: Colors.transparent
-
-              // shadowColor: Colors.transparent,
-
-              // shape: RoundedRectangleBorder(borderRadius: borderRadius),
-            ),
-            child: Text(text,
-              style: textStyle,
-          ),
+          child: current!,
         ),
-      ),)
+      )
     ]);
   }
 }
